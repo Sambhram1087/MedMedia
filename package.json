@@ -1,0 +1,17 @@
+{
+  "name": "medmedia",
+  "version": "2.0.0",
+  "private": true,
+  "description": "MedMedia - verified network for doctors and healthcare students",
+  "engines": { "node": ">=20" },
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w web && npm run build -w server",
+    "start": "npm run start -w server",
+    "migrate": "npm run migrate -w server",
+    "seed": "npm run seed -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web"
+  }
+}

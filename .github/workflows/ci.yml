@@ -1,0 +1,33 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: med, POSTGRES_PASSWORD: med, POSTGRES_DB: medmedia }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U med" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://med:med@localhost:5432/medmedia
+      JWT_SECRET: ci-secret-ci-secret-ci-secret
+      ADMIN_EMAILS: asha@demo.medmedia.app
+      COOKIE_SECURE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run seed
+      - name: Start server and run end-to-end smoke test
+        run: |
+          npm start &
+          for i in $(seq 1 30); do curl -sf localhost:5000/healthz && break; sleep 1; done
+          npm run smoke -w server

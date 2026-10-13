@@ -1,0 +1,35 @@
+# One command to run everything locally:  JWT_SECRET=$(openssl rand -hex 32) docker compose up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: medmedia
+      POSTGRES_PASSWORD: medmedia
+      POSTGRES_DB: medmedia
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U medmedia']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - '5000:5000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://medmedia:medmedia@db:5432/medmedia
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET, e.g. JWT_SECRET=$(openssl rand -hex 32) docker compose up}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      COOKIE_SECURE: 'false' # plain http://localhost. Remove this line when deploying behind HTTPS.
+      STORAGE_DRIVER: local
+    volumes:
+      - uploads:/app/data
+
+volumes:
+  pgdata:
+  uploads:
