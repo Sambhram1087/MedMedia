@@ -184,3 +184,7 @@ Anyone signed in can post updates and case polls. Case polls and images require 
 - **Password reset and email verification.** These need an email provider (Resend, SES, Postmark). The `users` table is ready for it.
 - **Push notifications, direct messages, and content moderation tooling.** Admins can delete any post, clip or listing; reporting flows are not built.
 - **Legal review.** If you handle patient-adjacent content in India, get advice on the DPDP Act and your terms of use before launch.
+
+## Environment variables
+
+See `.env.example` for the full list with comments. Required: `DATABASE_URL`, `JWT_SECRET`.
